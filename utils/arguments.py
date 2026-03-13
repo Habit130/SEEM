@@ -6,6 +6,24 @@ import logging
 logger = logging.getLogger(__name__)
 
 
+def _merge_config_dict(base_dict, update_dict, prefix=""):
+    for key, value in update_dict.items():
+        full_key = f"{prefix}.{key}" if prefix else key
+        if isinstance(value, dict):
+            existing = base_dict.get(key)
+            if existing is None:
+                base_dict[key] = {}
+                existing = base_dict[key]
+            elif not isinstance(existing, dict):
+                raise TypeError(f"Cannot merge dict into non-dict config field: {full_key}")
+            _merge_config_dict(existing, value, prefix=full_key)
+        else:
+            ori_value = base_dict.get(key)
+            base_dict[key] = value
+            if ori_value is not None and ori_value != value:
+                logger.warning(f"Overrided {full_key} from {ori_value} to {base_dict[key]}")
+
+
 def load_config_dict_to_opt(opt, config_dict):
     """
     Load the key, value pairs from config_dict to opt, overriding existing values in opt
@@ -21,10 +39,20 @@ def load_config_dict_to_opt(opt, config_dict):
                 pointer[k_part] = {}
             pointer = pointer[k_part]
             assert isinstance(pointer, dict), "Overriding key needs to be inside a Python dict."
-        ori_value = pointer.get(k_parts[-1])
-        pointer[k_parts[-1]] = v
-        if ori_value:
-            logger.warning(f"Overrided {k} from {ori_value} to {pointer[k_parts[-1]]}")
+
+        if isinstance(v, dict):
+            existing = pointer.get(k_parts[-1])
+            if existing is None:
+                pointer[k_parts[-1]] = {}
+                existing = pointer[k_parts[-1]]
+            elif not isinstance(existing, dict):
+                raise TypeError(f"Cannot merge dict into non-dict config field: {k}")
+            _merge_config_dict(existing, v, prefix=k)
+        else:
+            ori_value = pointer.get(k_parts[-1])
+            pointer[k_parts[-1]] = v
+            if ori_value is not None and ori_value != v:
+                logger.warning(f"Overrided {k} from {ori_value} to {pointer[k_parts[-1]]}")
 
 
 def load_opt_from_config_files(conf_files):
