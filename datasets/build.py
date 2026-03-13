@@ -571,6 +571,10 @@ def build_evaluator(cfg, dataset_name, output_folder=None):
     if evaluator_type in ["retrieval"]:
         evaluator_list.append(RetrievalEvaluator(dataset_name, output_folder, cfg['MODEL']['DECODER']['RETRIEVAL']['ENSEMBLE']))
     if evaluator_type == "captioning":
+        if CaptioningEvaluator is None:
+            raise ModuleNotFoundError(
+                "CaptioningEvaluator requires caption_pycocotools, which is not installed in this environment."
+            )
         evaluator_list.append(CaptioningEvaluator(dataset_name, output_folder, MetadataCatalog.get(dataset_name).gt_json))
     if evaluator_type in ["grounding_refcoco", "grounding_phrasecut", "grounding_spatial", "grounding_entity"]:
         evaluator_list.append(GroundingEvaluator(dataset_name))
