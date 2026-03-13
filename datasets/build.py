@@ -45,6 +45,7 @@ from .evaluation import (InstanceSegEvaluator,
                          COCOPanopticEvaluator,
                          GroundingEvaluator,
                          InteractiveEvaluator,
+                         BinarySegEvaluator,
 )
 from modeling.utils import configurable
 from utils.distributed import get_world_size
@@ -316,7 +317,10 @@ def build_detection_train_loader(
 
 def get_config_from_name(cfg, dataset_name):
     # adjust config according to dataset
-    if 'refcoco' in dataset_name:
+    if 'custom_binary' in dataset_name:
+        cfg.update(cfg['CUSTOM'])
+        return cfg
+    elif 'refcoco' in dataset_name:
         cfg.update(cfg['REF'])
         return cfg
     elif 'cocomini' in dataset_name:
@@ -414,6 +418,8 @@ def build_eval_dataloader(cfg, ):
             mapper = PascalVOCSegDatasetMapperIX(cfg, False, dataset_name)
         elif 'sun' in dataset_name:
             mapper = SunRGBDSegDatasetMapper(cfg, False)
+        elif 'custom_binary' in dataset_name:
+            mapper = CustomBinarySegDatasetMapper(cfg, False)
         elif 'refcoco' in dataset_name:
             mapper = RefCOCODatasetMapper(cfg, False)
         else:
@@ -455,6 +461,9 @@ def build_train_dataloader(cfg, ):
         elif mapper_name == "refcoco":
             mapper = RefCOCODatasetMapper(cfg, True)
             loaders['ref'] = build_detection_train_loader(cfg, dataset_name=dataset_name, mapper=mapper)
+        elif mapper_name == "custom_binary_seg":
+            mapper = CustomBinarySegDatasetMapper(cfg, True)
+            loaders['custom'] = build_detection_train_loader(cfg, dataset_name=dataset_name, mapper=mapper)
         elif mapper_name == "coco_interactive":
             mapper = COCOPanopticInteractiveDatasetMapper(cfg, True)
             loaders['coco'] = build_detection_train_loader(cfg, dataset_name=dataset_name, mapper=mapper)
@@ -479,7 +488,15 @@ def build_evaluator(cfg, dataset_name, output_folder=None):
     if output_folder is None:
         output_folder = os.path.join(cfg["SAVE_DIR"], "inference")
     evaluator_list = []
-    evaluator_type = MetadataCatalog.get(dataset_name).evaluator_type
+    metadata = MetadataCatalog.get(dataset_name)
+    evaluator_type = metadata.evaluator_type
+
+    if getattr(metadata, "binary_seg_task", False):
+        return BinarySegEvaluator(
+            dataset_name,
+            output_dir=output_folder,
+            threshold=cfg["TEST"].get("BINARY_MASK_THRESHOLD", 0.5),
+        )
 
     # semantic segmentation
     if evaluator_type in ["sem_seg", "ade20k_panoptic_seg"]:

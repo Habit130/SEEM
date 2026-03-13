@@ -1,0 +1,58 @@
+BASENAME: seem_focalt_custom_binary_lang_v1
+SAVE_DIR: ./outputs/custom_binary_seem
+
+EVAL_AT_START: false
+WANDB: false
+
+GRADIENT_ACCUMULATE_STEP: 4
+
+CUSTOM_DATASET:
+  ROOT: ../dataset
+  TRAIN_JSON: train.json
+  TEST_JSON: test.json
+  CAPTION_INDEX: 2
+
+DATASETS:
+  TRAIN: ["custom_binary_train"]
+  TEST: ["custom_binary_test"]
+
+MODEL:
+  ENCODER:
+    NUM_CLASSES: 1
+  DECODER:
+    LVIS:
+      ENABLED: false
+    TEST:
+      SEMANTIC_ON: false
+      INSTANCE_ON: false
+      PANOPTIC_ON: false
+
+TRAIN:
+  BATCH_SIZE_TOTAL: 1
+  BATCH_SIZE_PER_GPU: 1
+
+TEST:
+  BATCH_SIZE_TOTAL: 1
+  BINARY_MASK_THRESHOLD: 0.5
+
+DATALOADER:
+  NUM_WORKERS: 4
+
+CUSTOM:
+  INPUT:
+    IMAGE_SIZE: 1024
+    MIN_SCALE: 0.1
+    MAX_SCALE: 2.0
+    RANDOM_FLIP: "horizontal"
+    FORMAT: "RGB"
+    MIN_SIZE_TEST: 512
+    MAX_SIZE_TEST: 1024
+    DATASET_MAPPER_NAME: "custom_binary_seg"
+  DATALOADER:
+    FILTER_EMPTY_ANNOTATIONS: False
+    NUM_WORKERS: 4
+    LOAD_PROPOSALS: False
+    SAMPLER_TRAIN: "TrainingSampler"
+    ASPECT_RATIO_GROUPING: True
+  TEST:
+    BATCH_SIZE_TOTAL: 1

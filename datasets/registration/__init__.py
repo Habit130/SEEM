@@ -1,4 +1,5 @@
 from . import (
+    register_custom_binary_dataset,
     register_refcoco_dataset,
     register_ade20k_full,
     register_ade20k_panoptic,

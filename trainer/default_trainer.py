@@ -291,9 +291,6 @@ class DefaultTrainer(UtilsTrainer, DistributedTrainer):
                 # evaluate and save ckpt every epoch
                 if batch_idx + 1 == self.train_params['updates_per_epoch']:
                     self.save_checkpoint(self.train_params['num_updates'])
-                    results = self._eval_on_set(self.save_folder)
-                    if self.opt['rank'] == 0 and self.opt['WANDB']:
-                        wandb.log(results)
                     break
 
             logger.info(f"This epoch takes {datetime.now() - epoch_start_time}")

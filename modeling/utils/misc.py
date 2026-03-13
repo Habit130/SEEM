@@ -179,6 +179,8 @@ def is_dist_avail_and_initialized():
 def get_class_names(name):
     if name is None:
         return None
+    elif 'custom_binary' in name:
+        return ["foreground", "background"]
     elif 'refcoco' in name:
         return ["background"]
     elif 'coco' in name:
