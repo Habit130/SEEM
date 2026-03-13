@@ -13,9 +13,25 @@ No intermediate validation is run during training.
 
 ## Environment
 
-Create the Linux environment from `environment.linux.4090.yml`.
+Use the one-shot setup script:
 
-After the environment is active, compile the deformable attention operator from `modeling/vision/encoder/ops`.
+```bash
+bash assets/scripts/setup_linux_4090.sh
+```
+
+If you prefer manual setup, the exact sequence is:
+
+```bash
+conda env create -f environment.linux.4090.yml
+conda activate seem-4090
+python -m pip install --upgrade pip
+python -m pip install setuptools==68.2.2 wheel packaging
+python -m pip install -r assets/requirements/requirements.linux.4090.txt
+python -m pip install --no-build-isolation git+https://github.com/MaureenZOU/detectron2-xyz.git
+python -m pip install git+https://github.com/openai/whisper.git
+cd modeling/vision/encoder/ops && python setup.py build install
+cd /path/to/SEEM
+```
 
 ## Required external asset
 
