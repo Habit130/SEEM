@@ -55,6 +55,8 @@ This script recreates the `seem-4090` Conda environment, installs Python depende
 
 If a previous environment was created with incompatible package versions, rerun the same helper. It removes the existing `seem-4090` environment before rebuilding it.
 
+The environment preinstalls `mpi4py` through Conda so that the training stack can import MPI support without building `mpi4py` from source during `pip install`.
+
 ## Initialization weight
 
 Prepare the required SEEM initialization checkpoint into the standard non-Git location:

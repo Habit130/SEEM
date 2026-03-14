@@ -15,6 +15,7 @@ dependencies:
   - packaging
   - cython=3.0.2
   - numpy=1.23.5
+  - mpi4py=3.1.5
   - pytorch=2.1.0
   - torchvision=0.16.0
   - pytorch-cuda=12.1
