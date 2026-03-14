@@ -2,6 +2,7 @@
 set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+ENV_NAME="seem-4090"
 
 if ! command -v conda >/dev/null 2>&1; then
   echo "conda not found in PATH" >&2
@@ -18,12 +19,15 @@ if [ -z "${CUDA_HOME:-}" ]; then
   CUDA_HOME="$(dirname "$(dirname "$(readlink -f "$(command -v nvcc)")")")"
 fi
 
+export PIP_DISABLE_PIP_VERSION_CHECK=1
+export PIP_NO_INPUT=1
+
 source "$(conda info --base)/etc/profile.d/conda.sh"
 
 conda deactivate >/dev/null 2>&1 || true
-conda env remove -n seem-4090 -y >/dev/null 2>&1 || true
+conda env remove -n "${ENV_NAME}" -y >/dev/null 2>&1 || true
 conda env create -f "${REPO_ROOT}/environment.linux.4090.yml"
-conda activate seem-4090
+conda activate "${ENV_NAME}"
 
 python -m pip install --upgrade pip
 python -m pip install setuptools==68.2.2 wheel packaging
@@ -35,4 +39,4 @@ cd "${REPO_ROOT}/modeling/vision/encoder/ops"
 python setup.py build install
 
 cd "${REPO_ROOT}"
-python -c "import torch; import detectron2; import wandb; print('environment_ok', torch.__version__)"
+python -c "import torch; import detectron2; import wandb; import whisper; import MultiScaleDeformableAttention; print('environment_ok', torch.__version__)"

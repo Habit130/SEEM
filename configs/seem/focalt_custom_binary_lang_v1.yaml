@@ -7,9 +7,6 @@ WANDB: false
 GRADIENT_ACCUMULATE_STEP: 4
 
 CUSTOM_DATASET:
-  ROOT: ../dataset
-  TRAIN_JSON: train.json
-  TEST_JSON: test.json
   CAPTION_INDEX: 2
 
 DATASETS:

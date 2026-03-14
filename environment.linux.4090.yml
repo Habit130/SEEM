@@ -5,7 +5,7 @@ channels:
   - conda-forge
 dependencies:
   - python=3.10
-  - pip
+  - pip>=24
   - git
   - ffmpeg
   - ninja
