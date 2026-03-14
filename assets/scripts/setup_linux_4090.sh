@@ -21,13 +21,16 @@ fi
 
 export PIP_DISABLE_PIP_VERSION_CHECK=1
 export PIP_NO_INPUT=1
+export MKL_INTERFACE_LAYER="${MKL_INTERFACE_LAYER:-LP64}"
 
 source "$(conda info --base)/etc/profile.d/conda.sh"
 
 conda deactivate >/dev/null 2>&1 || true
 conda env remove -n "${ENV_NAME}" -y >/dev/null 2>&1 || true
 conda env create -f "${REPO_ROOT}/environment.linux.4090.yml"
+set +u
 conda activate "${ENV_NAME}"
+set -u
 
 python -m pip install --upgrade pip
 python -m pip install setuptools==68.2.2 wheel packaging "numpy<2"
