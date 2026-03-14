@@ -53,6 +53,8 @@ bash assets/scripts/setup_linux_4090.sh
 
 This script recreates the `seem-4090` Conda environment, installs Python dependencies, installs Detectron2 and Whisper, builds the deformable attention extension, and verifies the final imports needed by the server workflow.
 
+If a previous environment was created with incompatible package versions, rerun the same helper. It removes the existing `seem-4090` environment before rebuilding it.
+
 ## Initialization weight
 
 Prepare the required SEEM initialization checkpoint into the standard non-Git location:
